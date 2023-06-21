@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class District {
+	private int id;
 	private String name;
 	private Date created;
 	private Member delegate;

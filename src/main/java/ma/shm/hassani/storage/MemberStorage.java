@@ -17,7 +17,7 @@ import org.json.JSONArray;
 public class MemberStorage {
 	private File membersFile;
 	FileWriter writer;
-
+	
 	public void storage() {
 		File dir = new File("C://Users//hp//WorkspaceEclipseIDE//hassani/data");
 		if(!dir.exists()) {
