@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -32,18 +33,42 @@ public class MemberStorage {
 			}
 		}
 	}
-		public void storeMember(Member member) {
+		public void storeMember(Member newMember) {
 			this.storage();
-		JSONObject jsonMember = new JSONObject(member);
-		try {
-			writer =new FileWriter(membersFile.getAbsolutePath());
-			writer.write(jsonMember.toString());
-			writer.close();
-			System.out.println("tsjl!!!");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+			ArrayList<Member> members = getMembers();
+			members.add(newMember);
+				try {
+					writer =new FileWriter(membersFile.getAbsolutePath());
+					writer.write("[");
+					for(Member member:members) {
+						JSONObject jsonMember = new JSONObject(member);
+					writer.write(jsonMember.toString());
+					writer.write("\n,");
+					}
+					writer.write("]");
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		
+		public void storeMembers(List <Member> members) {
+			this.storage();
+				try {
+					writer =new FileWriter(membersFile.getAbsolutePath());
+					writer.write("[");
+					for(Member member:members) {
+						JSONObject jsonMember = new JSONObject(member);
+					writer.write(jsonMember.toString());
+					writer.write("\n,");
+					}
+					writer.write("]");
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		
 	public ArrayList<Member> getMembers(){
 		this.storage();
 		JSONArray jsonArray = null;
@@ -66,5 +91,22 @@ public class MemberStorage {
 	}
 	public Member getById(Integer id) {
 		return this.getMembers().stream().filter(m->m.getId()==id).toList().get(0);
+	}
+	
+	public void updateMember(Integer id, Member member) {
+		Member newMember = getById(id);
+		newMember.setName(member.getName());
+		newMember.setGrade(member.getGrade());
+		newMember.setInvolved(member.getInvolved());
+		List<Member> members = getMembers();
+		members.removeIf(m->m.getId()==id);
+		members.forEach(m->System.out.println(m));
+		storeMembers(members);
+		storeMember(newMember);
+	}
+	public void deleteMember(Integer id) {
+		List<Member> members = getMembers();
+		members.removeIf(m->m.getId()==id);
+		storeMembers(members);
 	}
 }

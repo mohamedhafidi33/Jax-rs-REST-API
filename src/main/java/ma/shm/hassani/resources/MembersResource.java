@@ -41,13 +41,15 @@ public class MembersResource {
 	
 	@PUT
 	@Path("/{id}")
-	public Response updateMember(@PathParam("id")Integer id) {
-		return null;
+	public Response updateMember(@PathParam("id")Integer id, Member member) {
+		memberStorage.updateMember(id, member);
+		return Response.ok().build();
 	}
 	
 	@DELETE
 	@Path("/{id}")
 	public Response deleteMember(@PathParam("id") Integer id){
-		return null;
+		memberStorage.deleteMember(id);
+		return Response.accepted().build();
 	}
 }
