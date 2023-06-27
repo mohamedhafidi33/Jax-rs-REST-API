@@ -23,33 +23,45 @@ public class MembersResource {
 	
 	@GET
 	@Path("/{id}")
-	public Member getMemberById(@PathParam("id")Integer id) {
-		 return memberStorage.getById(id);
+	public Response getMemberById(@PathParam("id")Integer id) {
+		if(memberStorage.getById(id)!=null) {
+		 return Response.status(Response.Status.OK).entity(memberStorage.getById(id)).build();}
+		else return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@POST
 	public Response createMember(Member member) {
+		if(member!=null) {
 		memberStorage.storeMember(member);
-		return Response.ok().build();
+		return Response.status(Response.Status.CREATED).build();
+		}
+		return Response.status(Response.Status.BAD_REQUEST).build();
 	}
 	
 	@GET
-	public List<Member> getMembers(){
-		memberStorage.getMembers().forEach(m->System.out.println(m));
-		return memberStorage.getMembers();
+	public Response getMembers(){
+		List<Member> members = memberStorage.getMembers();
+		if(members!=null) {
+			return Response.status(Response.Status.OK).entity(members).build();
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@PUT
 	@Path("/{id}")
 	public Response updateMember(@PathParam("id")Integer id, Member member) {
-		memberStorage.updateMember(id, member);
+		if(memberStorage.updateMember(id, member)) {
 		return Response.ok().build();
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@DELETE
 	@Path("/{id}")
 	public Response deleteMember(@PathParam("id") Integer id){
-		memberStorage.deleteMember(id);
+		if(memberStorage.deleteMember(id)) {
 		return Response.accepted().build();
+		}
+		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 }

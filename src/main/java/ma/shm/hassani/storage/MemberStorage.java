@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -41,7 +42,7 @@ public class MemberStorage {
 					writer =new FileWriter(membersFile.getAbsolutePath());
 					writer.write("[");
 					for(Member member:members) {
-						JSONObject jsonMember = new JSONObject(member);
+					JSONObject jsonMember = new JSONObject(member);
 					writer.write(jsonMember.toString());
 					writer.write("\n,");
 					}
@@ -90,11 +91,16 @@ public class MemberStorage {
 		return members;
 	}
 	public Member getById(Integer id) {
-		return this.getMembers().stream().filter(m->m.getId()==id).toList().get(0);
+	 List<Member> members = getMembers().stream().filter(m->m.getId()==id).toList();
+	 if(members.size()==0) {
+		 return null;
+	 }
+	 else return members.get(0);
 	}
 	
-	public void updateMember(Integer id, Member member) {
+	public boolean updateMember(Integer id, Member member) {
 		Member newMember = getById(id);
+		if(newMember!=null) {
 		newMember.setName(member.getName());
 		newMember.setGrade(member.getGrade());
 		newMember.setInvolved(member.getInvolved());
@@ -103,10 +109,14 @@ public class MemberStorage {
 		members.forEach(m->System.out.println(m));
 		storeMembers(members);
 		storeMember(newMember);
+		return true;
+		}
+		return false;
 	}
-	public void deleteMember(Integer id) {
+	public boolean deleteMember(Integer id) {
 		List<Member> members = getMembers();
-		members.removeIf(m->m.getId()==id);
+		boolean action = members.removeIf(m->m.getId()==id);
 		storeMembers(members);
+		return action;
 	}
 }
