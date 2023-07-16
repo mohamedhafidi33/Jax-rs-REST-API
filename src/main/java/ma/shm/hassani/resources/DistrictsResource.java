@@ -42,6 +42,7 @@ public class DistrictsResource {
 	
 	@POST
 	public Response createDistrict(District district) {
+		System.out.println("dazt hna");
 		if(district!=null) {
 		districtStorage.storeDistrict(district);
 		return Response.noContent().build();
@@ -68,5 +69,10 @@ public class DistrictsResource {
 			return Response.accepted().build();
 			}
 			return Response.status(Response.Status.NOT_FOUND).build();
+	}
+	
+	@Path("/{districtId}/members")
+	public MembersResource getMemberResource() {
+		return new MembersResource();
 	}
 }
