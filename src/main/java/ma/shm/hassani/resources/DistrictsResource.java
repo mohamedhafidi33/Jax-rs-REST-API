@@ -10,10 +10,14 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.UriInfo;
 import ma.shm.hassani.entities.District;
+import ma.shm.hassani.services.DistrictService;
 import ma.shm.hassani.storage.DistrictStorage;
 
 @Path("districts")
@@ -21,6 +25,8 @@ import ma.shm.hassani.storage.DistrictStorage;
 @Produces(MediaType.APPLICATION_JSON)
 public class DistrictsResource {
 	DistrictStorage districtStorage = new DistrictStorage();
+	DistrictService districtService = new DistrictService();
+	
 	@GET
 	public Response getDistricts() {
 		List<District> districts = districtStorage.getDistricts();
@@ -32,19 +38,20 @@ public class DistrictsResource {
 	
 	@GET
 	@Path("/{id}")
-	public Response getDistrictById(@PathParam("id")Integer id) {
-		District district = districtStorage.getDistrictById(id);
+	public Response getDistrictById(@PathParam("id")Integer id,@Context UriInfo uriInfo) {
+		District district = districtService.getDistrictById(id);
 		if(district!=null) {
-			return Response.status(Status.OK).entity(district).build();
+			Link self = Link.fromUriBuilder(uriInfo.getAbsolutePathBuilder())
+                    .rel("self").build();
+			return Response.status(Status.OK).entity(district).links(self).build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@POST
 	public Response createDistrict(District district) {
-		System.out.println("dazt hna");
 		if(district!=null) {
-		districtStorage.storeDistrict(district);
+			districtService.save(district);
 		return Response.noContent().build();
 		}
 		return Response.status(Status.BAD_REQUEST).build();

@@ -13,6 +13,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import ma.shm.hassani.entities.Member;
+import ma.shm.hassani.services.MemberService;
 import ma.shm.hassani.storage.DistrictStorage;
 import ma.shm.hassani.storage.MemberStorage;
 
@@ -22,14 +23,16 @@ import ma.shm.hassani.storage.MemberStorage;
 public class MembersResource {
 	MemberStorage memberStorage= new MemberStorage();
 	DistrictStorage dstrcs = new DistrictStorage();
+	MemberService memberService = new MemberService();
 	
 	@GET
 	@Path("/{id}")
 	public Response getMemberById(@PathParam("districtId")Integer districtId,@PathParam("id")Integer id) {
-		if(dstrcs.getDistrictById(districtId)!=null) {
-			System.out.println("rah kayn"+dstrcs.getDistrictById(districtId).toString());
-		 return Response.status(Response.Status.OK).entity(dstrcs.getDistrictById(districtId).getMembers().stream().filter(m->m.getId()==id)).build();}
-		else return Response.status(Response.Status.NOT_FOUND).build();
+		List<Member> members = memberService.getMembersFromDistrict(districtId, id);
+		if(members!=null) {
+		 return Response.status(Response.Status.OK).entity(members).build();
+		}
+		 return Response.status(Response.Status.NOT_FOUND).build();
 	}
 	
 	@POST
@@ -43,7 +46,9 @@ public class MembersResource {
 	
 	@GET
 	public Response getMembers(@PathParam("districtId")Integer districtId){
-		List<Member> members = memberStorage.getMembers();
+//		System.out.println(dstrcs.getDistrictById(districtId).toString());
+		List<Member> members = dstrcs.getDistrictById(districtId).getMembers();
+		members.forEach(System.out::println);
 		if(members!=null) {
 			return Response.status(Response.Status.OK).entity(members).build();
 		}
