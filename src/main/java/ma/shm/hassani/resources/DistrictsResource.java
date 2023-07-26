@@ -1,5 +1,6 @@
 package ma.shm.hassani.resources;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.Consumes;
@@ -11,12 +12,12 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Link;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 import ma.shm.hassani.entities.District;
+import ma.shm.hassani.entities.Link;
 import ma.shm.hassani.services.DistrictService;
 import ma.shm.hassani.storage.DistrictStorage;
 
@@ -41,9 +42,19 @@ public class DistrictsResource {
 	public Response getDistrictById(@PathParam("id")Integer id,@Context UriInfo uriInfo) {
 		District district = districtService.getDistrictById(id);
 		if(district!=null) {
-			Link self = Link.fromUriBuilder(uriInfo.getAbsolutePathBuilder())
-                    .rel("self").build();
-			return Response.status(Status.OK).entity(district).links(self).build();
+			String self = uriInfo.getBaseUriBuilder()
+					.path(DistrictsResource.class)
+					.path(Integer.toString(district.getId()))
+					.build()
+					.toString();
+			String members = uriInfo.getBaseUriBuilder()
+					.path(DistrictsResource.class)
+					.path(Integer.toString(district.getId()))
+					.path("/members")
+					.build()
+					.toString();
+			district.setLinks(List.of(new Link("self",self),new Link("members",members)));
+			return Response.status(Status.OK).entity(district).build();
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
