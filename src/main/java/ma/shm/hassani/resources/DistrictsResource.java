@@ -1,6 +1,5 @@
 package ma.shm.hassani.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.ws.rs.Consumes;
